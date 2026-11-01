@@ -1,54 +1,58 @@
-# FixLagMCPE — BareBright + No Animations
+# FixLagMCPE — BareBright Lite v2
 
-Bộ công cụ tối ưu Minecraft Bedrock/MCPE theo hướng nhẹ, sáng và đơn giản.
+Bộ tối ưu Minecraft Bedrock/MCPE gồm Resource Pack và Behavior Pack. Mã nguồn build và công cụ tối ưu pack mod nằm trong repo.
 
-## Có gì trong repo?
+## Tính năng bản v2
 
-- `dist/FixLagMCPE_BareBright.mcpack`: Resource Pack nhẹ, gồm 13 texture khối tự vẽ ở 16×16 và icon riêng.
-- `tools/strip_animations.py`: tạo bản sao Resource Pack của mod và gỡ các khai báo animation ở `minecraft:client_entity` / `minecraft:attachable`.
-- `tools/build_pack.py`: tự dựng lại file `.mcpack` từ mã nguồn texture.
+- Texture khối tự vẽ 16×16, màu sáng hơn và có hoa văn pixel nhỏ.
+- Texture mây pixel đơn giản.
+- Không dùng shader, custom geometry hoặc Script API.
+- Tắt flipbook animation được đăng ký trong Resource Pack.
+- 6 âm thanh OGG tự tạo cho đào/đặt đá, đất và gỗ; remap các nhóm block phổ biến.
+- Fog tùy chỉnh kéo dài tầm nhìn khi ở trong nước/lava; Behavior Pack áp dụng fog một lần cho mỗi người chơi.
+- Behavior Pack không chạy vòng lặp lệnh nặng sau khi đã gắn tag người chơi.
 
-## Cài pack BareBright
+## Tự build Resource Pack + Behavior Pack
 
-1. Tải `dist/FixLagMCPE_BareBright.mcpack` về điện thoại.
-2. Mở file bằng Minecraft để import.
-3. Vào **Settings → Global Resources → My Packs** hoặc bật trong **Edit World → Resource Packs**.
-4. Đặt pack này lên trên các resource pack khác nếu muốn texture của nó được ưu tiên.
-5. Trong **Video**, tăng **Brightness** lên 100% để màn hình sáng hơn.
-
-## Tắt animation của một mod
-
-Công cụ cần Resource Pack gốc của mod (file `.mcpack` hoặc thư mục đã giải nén). Trên Termux:
+Cần Python 3, Pillow và FFmpeg có hỗ trợ libvorbis.
 
 ```sh
-pkg install git python -y
-git clone https://github.com/kiet13312/Fixlagmcpe.git
-cd Fixlagmcpe
-termux-setup-storage
-python tools/strip_animations.py "/sdcard/Download/ten_mod.mcpack" --mcpack
+pip install pillow
+python tools/build_addon.py
 ```
 
-Hoặc chạy trên máy tính:
+Script tạo:
+- `dist/FixLagMCPE_BareBright_v2.mcaddon` — gói cài cả hai pack.
+- `dist/FixLagMCPE_BareBright_Lite.mcpack` — Resource Pack.
+- `dist/FixLagMCPE_Lite_Behavior.mcpack` — Behavior Pack.
+- `dist/FixLagMCPE_texture_preview.png` — ảnh xem trước texture.
+
+## Cài đặt
+
+1. Mở file `.mcaddon` bằng Minecraft để import.
+2. Trong Edit World, bật **FixLagMCPE | BareBright Lite** ở Resource Packs.
+3. Bật **FixLagMCPE | Lite Behavior** ở Behavior Packs.
+4. Nếu fog không tự áp dụng, bật Cheats/Commands rồi chạy `/function apply_fog`.
+5. Khôi phục fog mặc định bằng `/function remove_fog`.
+
+## Tối ưu Resource Pack của mod khác
 
 ```sh
-python tools/strip_animations.py "duong_dan/ResourcePackMod.mcpack" --mcpack
+python tools/optimize_mod_pack.py "/sdcard/Download/mod_resource.mcpack" --mcpack
 ```
 
-Công cụ tạo thư mục `*_NoAnimations` và file `.mcpack` tương ứng, không ghi đè pack gốc. Nếu kết quả đã tồn tại, hãy đổi tên/xóa kết quả cũ hoặc dùng `--output`.
+Công cụ tạo bản sao, xóa khai báo animation client entity/attachable, xóa thư mục animation không còn tham chiếu, làm rỗng flipbook list, giảm ảnh PNG lớn xuống tối đa 128 px và tăng nhẹ độ sáng ảnh trong `textures/blocks`. Thêm `--remove-particles` để xóa particle folder (có thể làm mất hiệu ứng đặc biệt).
 
-## Tùy chỉnh / build lại pack
+## Giới hạn kỹ thuật
 
-Cần Python 3, không cần cài thư viện ngoài:
+- Resource Pack không thể ép FPS, render distance, độ sáng màn hình hoặc sức mạnh GPU. Tinh chỉnh Video Settings trong game để cân bằng FPS.
+- Fog nước/lava được giảm rất mạnh nhưng không biến nước thành kính trong suốt; hiệu quả tùy phiên bản Bedrock.
+- Âm thanh custom áp dụng cho các nhóm block phổ biến được remap. Block mod có âm thanh riêng có thể vẫn dùng âm thanh của mod.
+- Không thể xóa tất cả tác nhân lag của một mod nếu chưa có file gốc; công cụ tối ưu trên chỉ xử lý phần Resource Pack, không sửa behavior script.
+- Texture mây phụ thuộc cách phiên bản game render texture môi trường; không thay đổi màu bầu trời theo biome/thời gian.
 
-```sh
-python tools/build_pack.py
-```
+## Công cụ
 
-File mới sẽ nằm ở `dist/FixLagMCPE_BareBright.mcpack`.
-
-## Giới hạn cần biết
-
-- Pack BareBright dùng texture 16×16 tối giản cho một số khối phổ biến; đây không phải bản sao texture của Bare Bones.
-- Resource Pack thông thường không thể ép gamma/độ sáng màn hình của toàn game. Hãy đặt Brightness trong Minecraft lên 100%.
-- Tắt animation có thể giảm tải khi mod có nhiều entity/animation, nhưng không đảm bảo FPS tăng trên mọi máy. Công cụ chỉ bỏ khai báo animation ở client entity và attachable; animation được điều khiển bởi script ngoài, behavior pack hoặc định nghĩa đặc biệt khác có thể còn lại.
-- Không có shader, hiệu ứng hậu kỳ, model 3D mới hay behavior script trong pack BareBright.
+- `tools/build_addon.py`: tạo hai pack và gói `.mcaddon`.
+- `tools/optimize_mod_pack.py`: tối ưu Resource Pack của mod khác.
+- `tools/strip_animations.py`: tiện ích gỡ khai báo animation client entity/attachable.
