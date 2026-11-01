@@ -14,10 +14,10 @@ Bộ tối ưu Minecraft Bedrock/MCPE gồm Resource Pack và Behavior Pack. Mã
 
 ## Tự build Resource Pack + Behavior Pack
 
-Cần Python 3, Pillow và FFmpeg có hỗ trợ libvorbis.
+Cần Python 3, Pillow, NumPy và FFmpeg có hỗ trợ libvorbis.
 
 ```sh
-pip install pillow
+pip install pillow numpy
 python tools/build_addon.py
 ```
 
